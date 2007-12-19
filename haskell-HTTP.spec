@@ -9,7 +9,7 @@ Url: http://www.haskell.org/http
 Group: Development/Other
 License: BSD3
 Source: http://www.haskell.org/http/download/%{srcname}.tar.gz
-BuildRequires: ghc
+BuildRequires: ghc hugs98 ghc-prof
 BuildRequires: haddock
 Requires(post): ghc
 Requires(preun): ghc
