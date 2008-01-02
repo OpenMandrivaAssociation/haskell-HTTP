@@ -11,6 +11,7 @@ License: BSD3
 Source: http://www.haskell.org/http/download/%{srcname}.tar.gz
 BuildRequires: ghc hugs98 ghc-prof
 BuildRequires: haddock
+BuildRoot: %_tmppath/%name-%version-%release-root
 Requires(post): ghc
 Requires(preun): ghc
 
