@@ -1,16 +1,15 @@
 %define module HTTP
-%define srcname http-20060707
 
 Name: haskell-%{module}
-Version: 2006.7.7
-Release: %mkrel 6
+Version: 4000.0.8
+Release: %mkrel 1
 Summary: A library for client-side HTTP
 Url: http://www.haskell.org/http
 Group: Development/Other
 License: BSD3
-Source: http://www.haskell.org/http/download/%{srcname}.tar.gz
+Source: http://www.haskell.org/http/download/%{module}-%{version}.tar.gz
 BuildRequires: ghc hugs98 ghc-prof
-BuildRequires: haddock
+BuildRequires: haddock haskell-macros
 BuildRoot: %_tmppath/%name-%version-%release-root
 Requires(post): ghc
 Requires(preun): ghc
@@ -19,33 +18,31 @@ Requires(preun): ghc
 A library for client-side HTTP
 
 %prep
-%setup -q -n %{srcname}
+%setup -q -n %{module}-%{version}
 
 %build
-runhaskell Setup.lhs configure --prefix=%{_prefix}
-runhaskell Setup.lhs build
-runhaskell Setup.lhs haddock
+%define _cabal_setup Setup.lhs
+%_cabal_build
 
-runhaskell Setup.lhs   register --gen-script
-runhaskell Setup.lhs unregister --gen-script
+%_cabal_genscripts
+
+%check
+%_cabal_check
 
 %install
-runhaskell Setup.lhs copy --destdir=%{buildroot}
+%_cabal_install
 
 rm -rf %buildroot%{_datadir}/%{module}-%{version}/doc
 
-%check
-runhaskell Setup.lhs test
+%_cabal_rpm_gen_deps
 
-%post -f register.sh
-
-%preun -f unregister.sh
+%_cabal_scriptlets
 
 %files
 %defattr(-,root,root)
-%doc dist/doc/html
-%doc README
 %_libdir/%{module}-%{version}
+%_docdir/%{module}-%{version}
+%_cabal_rpm_files
 
 %clean
 rm -fr %buildroot
