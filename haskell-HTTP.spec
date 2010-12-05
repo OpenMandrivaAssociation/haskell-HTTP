@@ -2,7 +2,7 @@
 
 Name: haskell-%{module}
 Version: 4000.0.8
-Release: %mkrel 1
+Release: %mkrel 2
 Summary: A library for client-side HTTP
 Url: http://www.haskell.org/http
 Group: Development/Other
