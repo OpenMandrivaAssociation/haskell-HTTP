@@ -1,50 +1,76 @@
+%global debug_package %{nil}
+%define _cabal_setup Setup.lhs
+#% define _no_haddock 1
 %define module HTTP
+Name:           haskell-%{module}
+Version:        4000.2.6
+Release:        1
+Summary:        A library for client-side HTTP
+Group:          Development/Other
+License:        BSD
+URL:            http://hackage.haskell.org/package/%{module}
+Source0:        http://hackage.haskell.org/packages/archive/%{module}/%{version}/%{module}-%{version}.tar.gz
 
-Name: haskell-%{module}
-Version: 4000.0.8
-Release: %mkrel 2
-Summary: A library for client-side HTTP
-Url: http://www.haskell.org/http
-Group: Development/Other
-License: BSD3
-Source: http://www.haskell.org/http/download/%{module}-%{version}.tar.gz
-BuildRequires: ghc hugs98 ghc-prof
-BuildRequires: haddock haskell-macros
-BuildRoot: %_tmppath/%name-%version-%release-root
-Requires(post): ghc
-Requires(preun): ghc
+BuildRequires:  ghc, ghc-devel, haskell-macros, haddock
+buildrequires:  haskell(network)
+buildrequires:  haskell(parsec)
+Requires(pre):  ghc
+requires(pre):  haskell(network)
+requires(pre):  haskell(parsec)
 
 %description
-A library for client-side HTTP
+The HTTP package supports client-side web programming in Haskell. It lets you
+set up HTTP connections, transmitting requests and processing the responses
+coming back, all from within the comforts of Haskell. It's dependent on the
+network package to operate, but other than that, the implementation is all
+written in Haskell.
+.
+A basic API for issuing single HTTP requests + receiving responses is provided.
+On top of that, a session-level abstraction is also on offer  (the
+@BrowserAction@ monad); it taking care of handling the management of persistent
+connections, proxies, state (cookies) and authentication credentials required
+to handle multi-step interactions with a web server.
+.
+The representation of the bytes flowing across is extensible via the use of a
+type class, letting you pick the representation of requests and responses that
+best fits your use.  Some pre-packaged, common instances are provided for you
+(@ByteString@, @String@.)
+.
+Here's an example use:
+.
+>
+>    do
+>      rsp <- Network.HTTP.simpleHTTP (getRequest "http://www.haskell.org/")
+>              -- fetch document and return it (as a 'String'.)
+>      fmap (take 100) (getResponseBody rsp)
+>
+>    do
+>      (_, rsp)
+>         <- Network.Browser.browse $ do
+>               setAllowRedirects True -- handle HTTP redirects
+>               request $ getRequest "http://www.haskell.org/"
+>      return (take 100 (rspBody rsp))
 
 %prep
 %setup -q -n %{module}-%{version}
 
 %build
-%define _cabal_setup Setup.lhs
 %_cabal_build
-
-%_cabal_genscripts
-
-%check
-%_cabal_check
 
 %install
 %_cabal_install
-
-rm -rf %buildroot%{_datadir}/%{module}-%{version}/doc
-
 %_cabal_rpm_gen_deps
-
 %_cabal_scriptlets
 
-%files
-%defattr(-,root,root)
-%_libdir/%{module}-%{version}
-%_docdir/%{module}-%{version}
-%_cabal_rpm_files
+#% check
+#% _cabal_check
 
-%clean
-rm -fr %buildroot
+%files
+%defattr(-,root,root,-)
+%{_docdir}/%{module}-%{version}
+%{_libdir}/%{module}-%{version}
+%_cabal_rpm_deps_dir
+%_cabal_haddoc_files
+
 
 
